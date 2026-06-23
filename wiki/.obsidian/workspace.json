@@ -1,0 +1,225 @@
+{
+  "main": {
+    "id": "8da59739e408a0bb",
+    "type": "split",
+    "children": [
+      {
+        "id": "2a43266133aa70ed",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d1d7ce65bbc9d235",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "9a58e9b5d9b4817d",
+    "type": "split",
+    "children": [
+      {
+        "id": "dd11bef208b474b5",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "38a958a13f8c3853",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "b0d6e9d2ad20e393",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "9f71698cbfa762ef",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "5d1dfc4e0784754e",
+    "type": "split",
+    "children": [
+      {
+        "id": "2a1b7dc261961cd9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "96791798df0a65a2",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "pages/40 - Base de données Supabase.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for 40 - Base de données Supabase"
+            }
+          },
+          {
+            "id": "3a082b53c755b548",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "pages/40 - Base de données Supabase.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from 40 - Base de données Supabase"
+            }
+          },
+          {
+            "id": "809ae26b281042c2",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "85b93b3dcaa804a7",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "1ff76fd9da68fefd",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "pages/40 - Base de données Supabase.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of 40 - Base de données Supabase"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "d1d7ce65bbc9d235",
+  "lastOpenFiles": [
+    "log.md.tmp.2302629.cd91bc48999c",
+    "index.md.tmp.2302629.aedb0d583189",
+    "syntheses/Réalisation v1 - Application AKADIA.md",
+    "assets/2026-06-23 - AKADIA cours desktop 3 colonnes.jpeg",
+    "assets/2026-06-23 - AKADIA cours (3 colonnes + AKA).jpeg",
+    "assets/2026-06-23 - AKADIA features.jpeg",
+    "assets/2026-06-23 - AKADIA accueil.jpeg",
+    "pages/40 - Base de données Supabase.md",
+    "log.md.tmp.2302629.8c121580ed49",
+    "pages/00 - Index (MOC).md.tmp.2302629.7fc8fb9c0303",
+    "index.md.tmp.2302629.f2a8f01fd22d",
+    "pages/50 - Livrables attendus.md",
+    "pages/50 - Livrables attendus.md.tmp.2302629.43d9a697c561",
+    "pages/42 - Accessibilité.md",
+    "pages/42 - Accessibilité.md.tmp.2302629.01056bb80cb4",
+    "pages/41 - Analytics.md",
+    "pages/41 - Analytics.md.tmp.2302629.4cdef88a69e7",
+    "pages/40 - Base de données Supabase.md.tmp.2302629.23cbd922f643",
+    "pages/35 - IA intégrée partout.md",
+    "pages/35 - IA intégrée partout.md.tmp.2302629.2460c571ee07",
+    "pages/34 - Générateur & bibliothèque de prompts.md",
+    "pages/34 - Générateur & bibliothèque de prompts.md.tmp.2302629.fc7d4ebe15f5",
+    "pages/33 - Laboratoire IA.md",
+    "pages/32 - Générateur de capsules vidéo IA.md",
+    "pages/31 - Générateur de formations IA.md",
+    "pages/30 - Assistant IA pédagogique (AKA).md",
+    "pages/25 - Administration, rôles & permissions.md",
+    "pages/24 - Classes virtuelles.md",
+    "pages/23 - Mode formateur présentiel.md",
+    "pages/22 - Page de cours.md",
+    "pages/21 - Espace apprenant.md",
+    "pages/20 - Site public & page d'accueil.md",
+    "pages/15 - Marketplace.md",
+    "pages/14 - Gamification.md",
+    "pages/13 - Certifications & attestations.md",
+    "pages/12 - Quiz intelligents.md",
+    "pages/11 - Types de contenu.md",
+    "pages/10 - Gestion & structure des formations.md",
+    "pages/03 - Design System.md",
+    "pages/02 - Stack technique & architecture.md"
+  ]
+}
