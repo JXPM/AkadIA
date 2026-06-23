@@ -27,15 +27,17 @@ SUPABASE_SERVICE_ROLE_KEY=...
 ## 3. Appliquer le schéma
 Pousser la migration et le seed :
 
-```bash
-# Via CLI Supabase (recommandé)
-supabase link --project-ref <ref>
-supabase db push                 # 0001 (schéma) + 0002 (trigger inscription + correctif RLS)
-# puis charger le seed de démo :
-psql "$SUPABASE_DB_URL" -f supabase/seed.sql
-```
+Le plus simple : un seul fichier `supabase/apply.sql` regroupe **0001** (schéma) +
+**0002** (trigger inscription + correctif RLS) + **0003** (lecture publique du
+catalogue) + **seed** (données de démo).
 
-(ou coller le contenu de `supabase/migrations/0001_init.sql` dans le SQL Editor du dashboard.)
+```bash
+# Option A — psql (récupérer le mot de passe : Dashboard → Settings → Database)
+psql "postgresql://postgres:VOTRE_MOT_DE_PASSE@db.brrvrpxiwcvpsldpacrc.supabase.co:5432/postgres" \
+  -f supabase/apply.sql
+
+# Option B — Dashboard → SQL Editor → coller le contenu de supabase/apply.sql → Run
+```
 
 ## 4. Authentification
 - **Email/mot de passe** : activé par défaut. Les formulaires `/connexion` et
