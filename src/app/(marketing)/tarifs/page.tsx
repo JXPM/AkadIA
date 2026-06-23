@@ -1,73 +1,69 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Check } from "lucide-react";
+import { MessagesSquare, ClipboardCheck, KeyRound, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Section, SectionHeading } from "@/components/marketing/section";
-import { plans, faq } from "@/lib/data";
-import { formatPrice, cn } from "@/lib/utils";
+import { faq } from "@/lib/data";
 
-export const metadata: Metadata = { title: "Tarifs" };
+export const metadata: Metadata = { title: "Pour les entreprises" };
 
-export default function TarifsPage() {
+const etapes = [
+  {
+    icon: MessagesSquare,
+    titre: "On échange",
+    desc: "Vous nous contactez et on cerne vos besoins de formation et vos équipes.",
+  },
+  {
+    icon: ClipboardCheck,
+    titre: "On définit le programme",
+    desc: "On choisit ensemble les formations pertinentes pour vos collaborateurs.",
+  },
+  {
+    icon: KeyRound,
+    titre: "On active l'accès",
+    desc: "On ouvre l'accès à la plateforme pour votre organisation, sans frais cachés.",
+  },
+  {
+    icon: CalendarClock,
+    titre: "Pour la durée convenue",
+    desc: "Vos équipes apprennent pendant la période définie ensemble.",
+  },
+];
+
+export default function EntreprisesPage() {
   return (
     <>
       <Section className="!pb-10">
         <SectionHeading
-          eyebrow="Tarifs"
-          title="Un plan pour chaque ambition"
-          subtitle="Commencez gratuitement, passez à l'échelle quand vous êtes prêt."
+          eyebrow="Pour les entreprises"
+          title="Un accès sur mesure, pas de catalogue à la carte"
+          subtitle="AKADIA s'adresse aux organisations. On définit ensemble le programme, puis on ouvre l'accès de vos équipes pour la durée qui vous convient."
         />
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          {plans.map((p) => (
-            <Card
-              key={p.nom}
-              className={cn(
-                "relative flex flex-col p-7",
-                p.highlight && "border-brand shadow-lg glow-brand"
-              )}
-            >
-              {p.highlight && (
-                <Badge variant="brand" className="absolute -top-3 left-7">
-                  Le plus populaire
-                </Badge>
-              )}
-              <h3 className="text-lg font-semibold">{p.nom}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{p.desc}</p>
-              <div className="mt-5 flex items-end gap-1">
-                <span className="text-4xl font-bold">
-                  {p.prix === null
-                    ? "Sur devis"
-                    : p.prix === 0
-                      ? "Gratuit"
-                      : formatPrice(p.prix)}
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {etapes.map((e, i) => (
+            <Card key={e.titre} className="flex flex-col gap-3 p-6">
+              <div className="flex items-center gap-3">
+                <span className="grid size-10 place-items-center rounded-xl bg-brand/10 text-brand">
+                  <e.icon className="size-5" />
                 </span>
-                {p.prix ? (
-                  <span className="mb-1 text-sm text-muted-foreground">
-                    {p.periode}
-                  </span>
-                ) : null}
+                <span className="text-sm font-semibold text-muted-foreground">
+                  Étape {i + 1}
+                </span>
               </div>
-              <ul className="mt-6 flex-1 space-y-3">
-                {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm">
-                    <Check className="mt-0.5 size-4 shrink-0 text-success" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Button
-                variant={p.highlight ? "brand" : "outline"}
-                className="mt-7 w-full"
-                asChild
-              >
-                <Link href={p.prix === null ? "/contact" : "/inscription"}>
-                  {p.cta}
-                </Link>
-              </Button>
+              <h3 className="font-semibold">{e.titre}</h3>
+              <p className="text-sm text-muted-foreground">{e.desc}</p>
             </Card>
           ))}
+        </div>
+        <div className="mt-12 flex flex-col items-center gap-4 text-center">
+          <p className="max-w-xl text-muted-foreground">
+            Chaque accès est défini avec vous : nombre d&apos;apprenants, formations
+            incluses et période. Parlons de votre projet.
+          </p>
+          <Button variant="brand" size="lg" asChild>
+            <Link href="/contact">Demander un accès</Link>
+          </Button>
         </div>
       </Section>
 

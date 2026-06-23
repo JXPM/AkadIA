@@ -25,19 +25,19 @@ insert into organizations (id, nom, slug, plan) values
 on conflict do nothing;
 
 -- Formations de démo
-insert into formations (id, organization_id, titre, slug, description, categorie, difficulte, duree_heures, prix, tags, objectifs, status, note, apprenants_count)
+insert into formations (id, organization_id, titre, slug, description, categorie, difficulte, duree_heures, tags, objectifs, status, note, apprenants_count)
 values
   ('22222222-0000-0000-0000-000000000001','11111111-1111-1111-1111-111111111111',
    'Maîtriser l''IA Générative en entreprise','maitriser-ia-generative',
    'De zéro à expert : LLM, prompts professionnels et déploiement sécurisé.',
-   'IA Générative','intermediaire',12,249,
+   'IA Générative','intermediaire',12,
    array['LLM','Prompt Engineering','RGPD'],
    array['Comprendre les LLM','Rédiger des prompts efficaces','Déployer en conformité RGPD'],
    'publiee',4.8,3240),
   ('22222222-0000-0000-0000-000000000002','11111111-1111-1111-1111-111111111111',
    'RGPD & Protection des données','rgpd-protection-donnees',
    'Mettez votre organisation en conformité RGPD.',
-   'RGPD & Données','debutant',8,179,
+   'RGPD & Données','debutant',8,
    array['RGPD','Conformité','DPO'],
    array['Maîtriser les principes du RGPD','Tenir un registre des traitements'],
    'publiee',4.7,2110)
@@ -71,9 +71,4 @@ insert into prompt_library (organization_id, titre, domaine, niveau, contenu) va
    'Tu es expert-comptable. Analyse le bilan suivant et identifie les 3 principaux risques financiers, avec recommandation chiffrée. Format : tableau.'),
   ('11111111-1111-1111-1111-111111111111','Synthèse RGPD pour dirigeants','Juridique','debutant',
    'Explique les obligations RGPD clés d''une PME en 5 points actionnables, sans jargon.')
-on conflict do nothing;
-
--- Abonnement de démo
-insert into subscriptions (organization_id, plan, status) values
-  ('11111111-1111-1111-1111-111111111111','pro','active')
 on conflict do nothing;

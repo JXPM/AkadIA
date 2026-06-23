@@ -12,7 +12,7 @@ npm run dev                  # http://localhost:3000
 ```
 
 ## Fonctionnalités
-- 🌐 **Site public** : accueil, catalogue/marketplace, fiches formation, tarifs, blog, contact
+- 🌐 **Site public** : accueil, catalogue, fiches formation, page entreprises, blog, contact
 - 🎓 **Espace apprenant** : dashboard, lecteur de cours 3 colonnes, gamification
 - 🤖 **Moteur IA** : assistant **AKA**, générateur de formations, laboratoire & bibliothèque de prompts
 - 🧑‍🏫 **Mode formateur présentiel** : sessions live, quiz/ateliers/escape games, projection, classement temps réel
@@ -33,6 +33,6 @@ Next.js 16 · React 19 · TypeScript · Tailwind v4 · shadcn-style UI · Framer
 ## Décisions par défaut (à confirmer)
 - LLM : **Claude via Vercel AI Gateway**
 - Multi-tenant : **RLS par `organization_id`**
-- Paiements : **Stripe** (intégration à finaliser)
+- Accès : **octroi par l'académie** (pas de vente en ligne) — une organisation reçoit l'accès à une formation pour une période définie (`acces_formations`)
 
 Voir [`docs/01-documentation-technique.md`](./docs/01-documentation-technique.md).

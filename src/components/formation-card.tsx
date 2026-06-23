@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Clock, Star, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { formatPrice, formatNumber, cn } from "@/lib/utils";
+import { formatNumber, cn } from "@/lib/utils";
 import type { Formation } from "@/lib/types";
 
 const gradients: Record<string, string> = {
@@ -29,9 +29,6 @@ export function FormationCard({ formation }: { formation: Formation }) {
             <Badge variant="secondary" className="bg-white/90 text-slate-900">
               {formation.categorie}
             </Badge>
-          </div>
-          <div className="absolute bottom-3 right-3 text-2xl font-bold text-white/90">
-            {formatPrice(formation.prix)}
           </div>
         </div>
         <div className="space-y-3 p-5">

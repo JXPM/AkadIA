@@ -48,7 +48,6 @@ type FormationRow = {
   categorie: string | null;
   difficulte: string | null;
   duree_heures: number | null;
-  prix: number | null;
   tags: string[] | null;
   objectifs: string[] | null;
   status: FormationStatus;
@@ -123,7 +122,6 @@ function mapFormation(row: FormationRow): Formation {
     categorie: row.categorie ?? "",
     difficulte: mapDifficulte(row.difficulte),
     duree: Number(row.duree_heures ?? 0),
-    prix: Number(row.prix ?? 0),
     tags: row.tags ?? [],
     objectifs: row.objectifs ?? [],
     status: row.status,
@@ -134,7 +132,7 @@ function mapFormation(row: FormationRow): Formation {
 }
 
 const FORMATION_SELECT =
-  "id, slug, titre, description, image_url, categorie, difficulte, duree_heures, prix, tags, objectifs, status, note, apprenants_count, auteur:profiles(nom, prenom), modules(id, titre, position, chapitres(id, titre, position, lessons(id, titre, type, duree_min, contenu, position)))";
+  "id, slug, titre, description, image_url, categorie, difficulte, duree_heures, tags, objectifs, status, note, apprenants_count, auteur:profiles(nom, prenom), modules(id, titre, position, chapitres(id, titre, position, lessons(id, titre, type, duree_min, contenu, position)))";
 
 // ---------- Requêtes ----------
 

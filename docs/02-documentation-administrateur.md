@@ -7,7 +7,7 @@ KPIs clés : apprenants, formations actives, taux de complétion, revenus. Graph
 
 ## Gérer les formations (`/admin/formations`)
 - Tableau de toutes les formations avec **statut** : Brouillon · Publiée · Archivée.
-- Chaque formation possède : titre, description, image, auteur, catégorie, difficulté, durée, prix, tags, objectifs.
+- Chaque formation possède : titre, description, image, auteur, catégorie, difficulté, durée, tags, objectifs.
 - Actions : créer, éditer, publier, archiver.
 - Hiérarchie éditable : **Formation → Modules → Chapitres → Leçons** (+ exercices, quiz, études de cas, projet final).
 
@@ -29,5 +29,5 @@ KPIs clés : apprenants, formations actives, taux de complétion, revenus. Graph
 ## Autres leviers
 - **Gamification** : badges, XP, niveaux, classements.
 - **Certifications / attestations** : suivi & réussite (PDF + QR + signature).
-- **Marketplace** : catalogue, prix, paiements (Stripe).
+- **Accès** : c'est l'académie qui ouvre l'accès d'une organisation cliente à une formation, pour une période définie (table `acces_formations`). Pas de vente à l'unité ni de paiement en ligne.
 - **Analytics** : progression, complétion, engagement.

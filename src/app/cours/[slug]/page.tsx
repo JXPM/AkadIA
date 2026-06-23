@@ -14,14 +14,11 @@ import { Progress } from "@/components/ui/progress";
 import { AkaAssistant } from "@/components/course/aka-assistant";
 import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { formations as demoFormations, lessonTypeLabels } from "@/lib/data";
-import { getFormationBySlug, isSupabaseEnabled } from "@/lib/queries";
+import { lessonTypeLabels } from "@/lib/data";
+import { getFormationBySlug } from "@/lib/queries";
 
-export function generateStaticParams() {
-  // Avec Supabase, rendu à la demande (pas d'accès cookies au build).
-  if (isSupabaseEnabled()) return [];
-  return demoFormations.map((f) => ({ slug: f.slug }));
-}
+// Données dynamiques (Supabase + cookies) : rendu à la demande.
+export const dynamic = "force-dynamic";
 
 export default async function CoursPage({
   params,

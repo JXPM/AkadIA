@@ -13,15 +13,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { formations as demoFormations, lessonTypeLabels } from "@/lib/data";
-import { getFormationBySlug, isSupabaseEnabled } from "@/lib/queries";
-import { formatPrice, formatNumber } from "@/lib/utils";
+import { lessonTypeLabels } from "@/lib/data";
+import { getFormationBySlug } from "@/lib/queries";
+import { formatNumber } from "@/lib/utils";
 
-export function generateStaticParams() {
-  // Avec Supabase, rendu à la demande (pas d'accès cookies au build).
-  if (isSupabaseEnabled()) return [];
-  return demoFormations.map((f) => ({ slug: f.slug }));
-}
+// Données dynamiques (Supabase + cookies) : rendu à la demande.
+export const dynamic = "force-dynamic";
 
 export default async function FormationDetailPage({
   params,
@@ -141,17 +138,21 @@ export default async function FormationDetailPage({
           </div>
         </div>
 
-        {/* Sidebar achat */}
+        {/* Sidebar accès */}
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <Card className="overflow-hidden">
             <div className="h-32 gradient-brand" />
             <div className="space-y-4 p-6">
-              <p className="text-3xl font-bold">{formatPrice(formation.prix)}</p>
+              <p className="text-lg font-semibold">Accès sur mesure</p>
+              <p className="text-sm text-muted-foreground">
+                Cette formation est ouverte aux organisations partenaires pour une
+                période définie. Contactez-nous pour activer l&apos;accès de vos équipes.
+              </p>
               <Button variant="brand" className="w-full" size="lg" asChild>
-                <Link href={`/cours/${formation.slug}`}>Commencer la formation</Link>
+                <Link href="/contact">Demander un accès</Link>
               </Button>
               <Button variant="outline" className="w-full" asChild>
-                <Link href="/inscription">Ajouter au panier</Link>
+                <Link href={`/cours/${formation.slug}`}>Aperçu du programme</Link>
               </Button>
               <ul className="space-y-2 pt-2 text-sm text-muted-foreground">
                 {[
@@ -159,7 +160,7 @@ export default async function FormationDetailPage({
                   `${totalLessons} leçons`,
                   "Assistant IA AKA inclus",
                   "Attestation de réussite",
-                  "Accès à vie",
+                  "Accès pour la durée convenue",
                 ].map((x) => (
                   <li key={x} className="flex items-center gap-2">
                     <Check className="size-4 text-success" /> {x}

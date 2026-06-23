@@ -96,47 +96,6 @@ export const faq = [
   },
 ];
 
-export const plans = [
-  {
-    nom: "Starter",
-    prix: 0,
-    periode: "gratuit",
-    desc: "Pour découvrir AKADIA.",
-    features: ["3 formations", "Assistant AKA limité", "100 apprenants", "Analytics de base"],
-    cta: "Commencer",
-    highlight: false,
-  },
-  {
-    nom: "Pro",
-    prix: 49,
-    periode: "/ mois",
-    desc: "Pour les formateurs et petites équipes.",
-    features: [
-      "Formations illimitées",
-      "Générateur IA complet",
-      "Capsules vidéo IA",
-      "Mode présentiel",
-      "Marketplace & paiements",
-    ],
-    cta: "Essayer Pro",
-    highlight: true,
-  },
-  {
-    nom: "Enterprise",
-    prix: null,
-    periode: "sur devis",
-    desc: "Pour les organisations exigeantes.",
-    features: [
-      "Multi-tenant avancé",
-      "SSO & rôles personnalisés",
-      "Intégrations Teams/Zoom/Meet",
-      "Support dédié & SLA",
-      "Hébergement RGPD",
-    ],
-    cta: "Nous contacter",
-    highlight: false,
-  },
-];
 
 export const badges: BadgeDef[] = [
   { id: "b1", nom: "Explorateur", description: "Première formation démarrée", icone: "Compass", obtenu: true },
@@ -193,7 +152,6 @@ export const formations: Formation[] = [
     categorie: "IA Générative",
     difficulte: "Intermédiaire",
     duree: 12,
-    prix: 249,
     tags: ["LLM", "Prompt Engineering", "Productivité", "RGPD"],
     objectifs: [
       "Comprendre le fonctionnement des LLM",
@@ -257,7 +215,6 @@ export const formations: Formation[] = [
     categorie: "RGPD & Données",
     difficulte: "Débutant",
     duree: 8,
-    prix: 179,
     tags: ["RGPD", "Conformité", "DPO", "Sécurité"],
     objectifs: [
       "Maîtriser les principes du RGPD",
@@ -297,7 +254,6 @@ export const formations: Formation[] = [
     categorie: "Data Analytics",
     difficulte: "Intermédiaire",
     duree: 16,
-    prix: 299,
     tags: ["Power BI", "DAX", "Dataviz", "BI"],
     objectifs: [
       "Modéliser des données proprement",
@@ -336,7 +292,6 @@ export const formations: Formation[] = [
     categorie: "Cybersécurité",
     difficulte: "Débutant",
     duree: 6,
-    prix: 149,
     tags: ["Sécurité", "Phishing", "MFA", "Incident"],
     objectifs: [
       "Adopter les bons réflexes de sécurité",
@@ -375,7 +330,6 @@ export const formations: Formation[] = [
     categorie: "Bureautique",
     difficulte: "Intermédiaire",
     duree: 10,
-    prix: 159,
     tags: ["Excel", "TCD", "Formules", "Automatisation"],
     objectifs: [
       "Maîtriser les formules avancées",
@@ -414,7 +368,6 @@ export const formations: Formation[] = [
     categorie: "Audit & Comptabilité",
     difficulte: "Avancé",
     duree: 14,
-    prix: 329,
     tags: ["Audit", "Contrôle interne", "Risques", "Normes"],
     objectifs: [
       "Planifier une mission d'audit",

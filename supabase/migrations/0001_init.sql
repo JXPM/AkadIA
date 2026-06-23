@@ -17,8 +17,6 @@ create type lesson_type as enum (
 create type question_type as enum ('qcm','vrai_faux','glisser_deposer','cas_pratique','reponse_libre');
 create type session_mode as enum ('presentiel','virtuelle','hybride');
 create type attestation_kind as enum ('suivi','reussite');
-create type payment_status as enum ('en_attente','paye','rembourse','echoue');
-create type sub_status as enum ('active','past_due','annulee','essai');
 
 -- ---------- TENANTS & IDENTITÉ ----------
 create table organizations (
@@ -74,7 +72,6 @@ create table formations (
   categorie text,
   difficulte difficulte not null default 'debutant',
   duree_heures numeric(5,1) default 0,
-  prix numeric(10,2) default 0,
   tags text[] default '{}',
   objectifs text[] default '{}',
   status formation_status not null default 'brouillon',
@@ -280,28 +277,22 @@ create table notifications (
 );
 create index idx_notifications_user on notifications(user_id);
 
--- ---------- PAIEMENTS / ABONNEMENTS ----------
-create table payments (
-  id uuid primary key default gen_random_uuid(),
-  organization_id uuid references organizations(id) on delete cascade,
-  user_id uuid references profiles(id) on delete set null,
-  formation_id uuid references formations(id) on delete set null,
-  montant numeric(10,2) not null,
-  devise text default 'EUR',
-  status payment_status not null default 'en_attente',
-  stripe_payment_id text,
-  created_at timestamptz not null default now()
-);
-
-create table subscriptions (
+-- ---------- ACCÈS AUX FORMATIONS ----------
+-- Pas de vente à l'unité : c'est l'académie (super_admin) qui ouvre l'accès
+-- d'une organisation cliente à une formation, pour une période définie.
+create table acces_formations (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references organizations(id) on delete cascade,
-  plan text not null,
-  status sub_status not null default 'essai',
-  stripe_subscription_id text,
-  renouvelle_le timestamptz,
-  created_at timestamptz not null default now()
+  formation_id uuid not null references formations(id) on delete cascade,
+  date_debut date not null default current_date,
+  date_fin date,                       -- null = sans échéance
+  actif boolean not null default true,
+  note text,                           -- contexte interne (ex. nom du contrat)
+  created_at timestamptz not null default now(),
+  unique (organization_id, formation_id)
 );
+create index idx_acces_org on acces_formations(organization_id);
+create index idx_acces_formation on acces_formations(formation_id);
 
 -- ---------- TRIGGER updated_at ----------
 create or replace function set_updated_at() returns trigger as $$
@@ -331,8 +322,7 @@ alter table formations      enable row level security;
 alter table sessions        enable row level security;
 alter table prompt_library  enable row level security;
 alter table analytics       enable row level security;
-alter table payments        enable row level security;
-alter table subscriptions   enable row level security;
+alter table acces_formations enable row level security;
 alter table badges          enable row level security;
 alter table notifications   enable row level security;
 
@@ -354,6 +344,9 @@ create policy formations_admin_write on formations
   for all using (organization_id = current_org() and is_admin())
   with check (organization_id = current_org() and is_admin());
 
--- Facturation : lecture admin du tenant
-create policy payments_admin on payments for select using (organization_id = current_org() and is_admin());
-create policy subs_admin on subscriptions for select using (organization_id = current_org() and is_admin());
+-- Accès aux formations : une organisation lit ses propres accès ;
+-- la gestion (octroi/révocation) est réservée aux admins.
+create policy acces_org_read on acces_formations
+  for select using (organization_id = current_org());
+create policy acces_admin_write on acces_formations
+  for all using (is_admin()) with check (is_admin());

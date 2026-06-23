@@ -35,7 +35,7 @@ docs/                        cette documentation
 ```
 
 ## Configuration
-1. `cp .env.example .env.local` puis renseigner Supabase / AI Gateway / Stripe.
+1. `cp .env.example .env.local` puis renseigner Supabase / AI Gateway.
 2. `NEXT_PUBLIC_DEMO_MODE=1` → l'app tourne sur le jeu de données local (`src/lib/data.ts`), sans Supabase.
 3. Sans `AI_GATEWAY_API_KEY`, les routes `/api/ai/*` répondent en **mode démo déterministe** ; avec la clé, elles utilisent Claude via l'AI Gateway.
 

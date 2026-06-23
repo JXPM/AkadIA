@@ -57,7 +57,6 @@ export interface Formation {
   categorie: string;
   difficulte: Difficulte;
   duree: number; // heures
-  prix: number;
   tags: string[];
   objectifs: string[];
   status: FormationStatus;

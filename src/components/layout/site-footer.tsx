@@ -6,7 +6,7 @@ const columns = [
     titre: "Produit",
     links: [
       { href: "/catalogue", label: "Catalogue" },
-      { href: "/tarifs", label: "Tarifs" },
+      { href: "/tarifs", label: "Pour les entreprises" },
       { href: "/laboratoire", label: "Laboratoire IA" },
       { href: "/app/dashboard", label: "Espace apprenant" },
     ],
@@ -16,7 +16,7 @@ const columns = [
     links: [
       { href: "/formateur", label: "Mode formateur" },
       { href: "/admin", label: "Administration" },
-      { href: "/a-propos", label: "Entreprises" },
+      { href: "/tarifs", label: "Entreprises" },
       { href: "/contact", label: "Nous contacter" },
     ],
   },

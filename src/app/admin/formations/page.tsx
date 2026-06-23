@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { getFormations } from "@/lib/queries";
-import { formatPrice, formatNumber } from "@/lib/utils";
+import { formatNumber } from "@/lib/utils";
 
 const statusBadge = {
   publiee: { label: "Publiée", variant: "success" as const },
@@ -45,7 +45,6 @@ export default async function AdminFormationsPage() {
                 <th className="px-4 py-3 font-medium">Statut</th>
                 <th className="px-4 py-3 font-medium">Apprenants</th>
                 <th className="px-4 py-3 font-medium">Note</th>
-                <th className="px-4 py-3 font-medium">Prix</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -73,7 +72,6 @@ export default async function AdminFormationsPage() {
                         {f.note}
                       </span>
                     </td>
-                    <td className="px-4 py-3 font-medium">{formatPrice(f.prix)}</td>
                     <td className="px-4 py-3 text-right">
                       <Button variant="ghost" size="icon" aria-label="Éditer">
                         <Pencil className="size-4" />
