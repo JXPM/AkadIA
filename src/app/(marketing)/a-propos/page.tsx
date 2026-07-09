@@ -1,20 +1,24 @@
 import type { Metadata } from "next";
 import { Section, SectionHeading } from "@/components/marketing/section";
 import { Card } from "@/components/ui/card";
+import { LordIcon, type LordIconName } from "@/components/ui/lord-icon";
 import { stats } from "@/lib/data";
 
 export const metadata: Metadata = { title: "À propos" };
 
-const valeurs = [
+const valeurs: { icon: LordIconName; titre: string; desc: string }[] = [
   {
+    icon: "etincelles",
     titre: "L'IA au service de l'humain",
     desc: "Nous automatisons la production et la maintenance pédagogique pour que formateurs et apprenants se concentrent sur l'essentiel.",
   },
   {
+    icon: "cible",
     titre: "Excellence pédagogique",
     desc: "Des parcours structurés, mesurables et certifiants, conçus avec des experts de chaque domaine.",
   },
   {
+    icon: "coeur",
     titre: "Accessible à tous",
     desc: "Conformité WCAG, mode sombre, navigation clavier et design mobile-first : apprendre sans barrière.",
   },
@@ -43,7 +47,10 @@ export default function AProposPage() {
         <SectionHeading title="Nos valeurs" />
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
           {valeurs.map((v) => (
-            <Card key={v.titre} className="p-6">
+            <Card key={v.titre} className="group p-6">
+              <div className="mb-4 grid size-11 place-items-center rounded-xl bg-brand/10">
+                <LordIcon icon={v.icon} size={26} trigger="loop-on-hover" target=".group" />
+              </div>
               <h3 className="font-semibold">{v.titre}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{v.desc}</p>
             </Card>

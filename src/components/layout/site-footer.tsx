@@ -63,7 +63,17 @@ export function SiteFooter() {
         </div>
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 text-sm text-muted-foreground sm:flex-row">
           <p>© {new Date().getFullYear()} AKADIA. Tous droits réservés.</p>
-          <p>Conçu pour rivaliser avec les meilleurs LMS du monde.</p>
+          <p>
+            Icônes animées par{" "}
+            <a
+              href="https://lordicon.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-2 transition-colors hover:text-foreground"
+            >
+              Lordicon.com
+            </a>
+          </p>
         </div>
       </div>
     </footer>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { LordIcon } from "@/components/ui/lord-icon";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { FormationCard } from "@/components/formation-card";
@@ -40,8 +40,10 @@ export function CatalogueClient({ formations }: { formations: Formation[] }) {
         </p>
       </div>
 
-      <div className="relative mt-8 max-w-md">
-        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="group relative mt-8 max-w-md">
+        <span className="absolute left-2.5 top-1/2 -translate-y-1/2">
+          <LordIcon icon="recherche" size={18} trigger="loop-on-hover" target=".group" />
+        </span>
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}

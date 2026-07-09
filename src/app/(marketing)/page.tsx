@@ -1,25 +1,25 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  Sparkles,
-  Video,
-  Bot,
-  MonitorPlay,
-  FlaskConical,
-  Trophy,
-  Check,
-  Star,
-} from "lucide-react";
+import { ArrowRight, Sparkles, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { LordIcon, type LordIconName } from "@/components/ui/lord-icon";
 import { Section, SectionHeading } from "@/components/marketing/section";
 import { Reveal } from "@/components/marketing/reveal";
 import { FormationCard } from "@/components/formation-card";
 import { stats, features, temoignages, faq } from "@/lib/data";
 import { getFormations } from "@/lib/queries";
 
-const iconMap = { Sparkles, Video, Bot, MonitorPlay, FlaskConical, Trophy };
+const featureIcons: Record<string, LordIconName> = {
+  Sparkles: "etincelles",
+  Video: "video",
+  Bot: "assistant",
+  MonitorPlay: "ecran",
+  FlaskConical: "outils",
+  Trophy: "confettis",
+};
+
+const statIcons: LordIconName[] = ["avatar", "livre", "graphique", "cible"];
 
 export default async function HomePage() {
   const formations = await getFormations();
@@ -109,7 +109,10 @@ export default async function HomePage() {
         <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
           {stats.map((s, i) => (
             <Reveal key={s.label} delay={i * 0.05}>
-              <div className="text-center">
+              <div className="group text-center">
+                <div className="mb-2 flex justify-center">
+                  <LordIcon icon={statIcons[i]} size={32} trigger="loop-on-hover" target=".group" />
+                </div>
                 <p className="text-3xl font-bold sm:text-4xl">{s.value}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{s.label}</p>
               </div>
@@ -127,12 +130,12 @@ export default async function HomePage() {
         />
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => {
-            const Icon = iconMap[f.icon as keyof typeof iconMap];
+            const icon = featureIcons[f.icon] ?? "etincelles";
             return (
               <Reveal key={f.titre} delay={i * 0.05}>
-                <Card className="h-full p-6 hover:shadow-md transition-shadow">
-                  <div className="mb-4 grid size-11 place-items-center rounded-xl bg-brand/10 text-brand">
-                    <Icon className="size-5" />
+                <Card className="group h-full p-6 hover:shadow-md transition-shadow">
+                  <div className="mb-4 grid size-11 place-items-center rounded-xl bg-brand/10">
+                    <LordIcon icon={icon} size={26} trigger="loop-on-hover" target=".group" />
                   </div>
                   <h3 className="font-semibold">{f.titre}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{f.desc}</p>
@@ -176,11 +179,14 @@ export default async function HomePage() {
         <div className="mt-14 grid gap-6 lg:grid-cols-3">
           {temoignages.map((t, i) => (
             <Reveal key={t.nom} delay={i * 0.05}>
-              <Card className="h-full p-6">
-                <div className="mb-4 flex">
-                  {Array.from({ length: 5 }).map((_, j) => (
-                    <Star key={j} className="size-4 fill-amber-400 text-amber-400" />
-                  ))}
+              <Card className="group h-full p-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="flex">
+                    {Array.from({ length: 5 }).map((_, j) => (
+                      <Star key={j} className="size-4 fill-amber-400 text-amber-400" />
+                    ))}
+                  </span>
+                  <LordIcon icon="coeur" size={22} trigger="loop-on-hover" target=".group" />
                 </div>
                 <p className="text-sm leading-relaxed">&ldquo;{t.texte}&rdquo;</p>
                 <div className="mt-5">
@@ -195,6 +201,9 @@ export default async function HomePage() {
 
       {/* FAQ */}
       <Section>
+        <div className="mb-4 flex justify-center">
+          <LordIcon icon="aide" size={44} trigger="loop" delay={3000} />
+        </div>
         <SectionHeading eyebrow="FAQ" title="Questions fréquentes" />
         <div className="mx-auto mt-12 max-w-3xl space-y-4">
           {faq.map((item, i) => (
@@ -243,7 +252,14 @@ export default async function HomePage() {
                 {["Sans carte bancaire", "Conforme RGPD", "Support en français"].map(
                   (x) => (
                     <li key={x} className="flex items-center gap-1.5">
-                      <Check className="size-4" /> {x}
+                      <LordIcon
+                        icon="coche"
+                        size={18}
+                        trigger="loop"
+                        delay={4000}
+                        colors="primary:#ffffff"
+                      />{" "}
+                      {x}
                     </li>
                   )
                 )}

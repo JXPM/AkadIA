@@ -1,31 +1,31 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { MessagesSquare, ClipboardCheck, KeyRound, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { LordIcon, type LordIconName } from "@/components/ui/lord-icon";
 import { Section, SectionHeading } from "@/components/marketing/section";
 import { faq } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Pour les entreprises" };
 
-const etapes = [
+const etapes: { icon: LordIconName; titre: string; desc: string }[] = [
   {
-    icon: MessagesSquare,
+    icon: "assistant",
     titre: "On échange",
     desc: "Vous nous contactez et on cerne vos besoins de formation et vos équipes.",
   },
   {
-    icon: ClipboardCheck,
+    icon: "coche",
     titre: "On définit le programme",
     desc: "On choisit ensemble les formations pertinentes pour vos collaborateurs.",
   },
   {
-    icon: KeyRound,
+    icon: "securite",
     titre: "On active l'accès",
     desc: "On ouvre l'accès à la plateforme pour votre organisation, sans frais cachés.",
   },
   {
-    icon: CalendarClock,
+    icon: "horloge",
     titre: "Pour la durée convenue",
     desc: "Vos équipes apprennent pendant la période définie ensemble.",
   },
@@ -42,10 +42,10 @@ export default function EntreprisesPage() {
         />
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {etapes.map((e, i) => (
-            <Card key={e.titre} className="flex flex-col gap-3 p-6">
+            <Card key={e.titre} className="group flex flex-col gap-3 p-6">
               <div className="flex items-center gap-3">
-                <span className="grid size-10 place-items-center rounded-xl bg-brand/10 text-brand">
-                  <e.icon className="size-5" />
+                <span className="grid size-10 place-items-center rounded-xl bg-brand/10">
+                  <LordIcon icon={e.icon} size={22} trigger="loop-on-hover" target=".group" />
                 </span>
                 <span className="text-sm font-semibold text-muted-foreground">
                   Étape {i + 1}

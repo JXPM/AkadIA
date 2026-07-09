@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LordIcon } from "@/components/ui/lord-icon";
 import { Section, SectionHeading } from "@/components/marketing/section";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,7 +50,15 @@ export default function BlogPage() {
         {articles.map((a) => (
           <Link key={a.titre} href="/blog" className="group">
             <Card className="h-full overflow-hidden hover:shadow-md transition-all">
-              <div className="h-36 gradient-brand opacity-90" />
+              <div className="grid h-36 place-items-center gradient-brand opacity-90">
+                <LordIcon
+                  icon="article"
+                  size={56}
+                  trigger="loop-on-hover"
+                  target=".group"
+                  colors="primary:#ffffff"
+                />
+              </div>
               <div className="space-y-2 p-6">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Badge variant="brand">{a.cat}</Badge>

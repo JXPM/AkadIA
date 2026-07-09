@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { LordIcon, type LordIconName } from "@/components/ui/lord-icon";
 import { Section } from "@/components/marketing/section";
 import { Card } from "@/components/ui/card";
 import { Input, Textarea } from "@/components/ui/input";
@@ -20,14 +20,16 @@ export default function ContactPage() {
             répond sous 24h.
           </p>
           <div className="mt-8 space-y-4">
-            {[
-              { icon: Mail, label: "contact@akadia.fr" },
-              { icon: Phone, label: "+33 1 84 80 00 00" },
-              { icon: MapPin, label: "12 rue de la Connaissance, 75002 Paris" },
-            ].map(({ icon: Icon, label }) => (
-              <div key={label} className="flex items-center gap-3">
-                <span className="grid size-10 place-items-center rounded-lg bg-brand/10 text-brand">
-                  <Icon className="size-4" />
+            {(
+              [
+                { icon: "email", label: "contact@akadia.fr" },
+                { icon: "telephone", label: "+33 1 84 80 00 00" },
+                { icon: "localisation", label: "12 rue de la Connaissance, 75002 Paris" },
+              ] satisfies { icon: LordIconName; label: string }[]
+            ).map(({ icon, label }) => (
+              <div key={label} className="group flex items-center gap-3">
+                <span className="grid size-10 place-items-center rounded-lg bg-brand/10">
+                  <LordIcon icon={icon} size={20} trigger="loop-on-hover" target=".group" />
                 </span>
                 <span className="text-sm">{label}</span>
               </div>
