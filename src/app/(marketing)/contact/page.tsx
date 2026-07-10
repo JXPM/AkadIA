@@ -4,10 +4,16 @@ import { Section } from "@/components/marketing/section";
 import { Card } from "@/components/ui/card";
 import { Input, Textarea } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { envoyerMessageContact } from "./actions";
 
 export const metadata: Metadata = { title: "Contact" };
 
-export default function ContactPage() {
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ sent?: string; error?: string }>;
+}) {
+  const { sent, error } = await searchParams;
   return (
     <Section>
       <div className="grid gap-12 lg:grid-cols-2">
@@ -38,32 +44,42 @@ export default function ContactPage() {
         </div>
 
         <Card className="p-6 sm:p-8">
-          <form className="space-y-4">
+          {sent && (
+            <p className="mb-4 rounded-lg border border-success/30 bg-success/10 px-3 py-2 text-sm text-success">
+              Message envoyé ! Nous vous répondons sous 24h.
+            </p>
+          )}
+          {error && (
+            <p className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {error}
+            </p>
+          )}
+          <form action={envoyerMessageContact} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium" htmlFor="prenom">
                   Prénom
                 </label>
-                <Input id="prenom" placeholder="Marie" />
+                <Input id="prenom" name="prenom" placeholder="Marie" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium" htmlFor="nom">
                   Nom
                 </label>
-                <Input id="nom" placeholder="Durand" />
+                <Input id="nom" name="nom" placeholder="Durand" />
               </div>
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium" htmlFor="email">
                 Email professionnel
               </label>
-              <Input id="email" type="email" placeholder="marie@entreprise.fr" />
+              <Input id="email" name="email" type="email" required placeholder="marie@entreprise.fr" />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium" htmlFor="message">
                 Message
               </label>
-              <Textarea id="message" rows={5} placeholder="Votre besoin…" />
+              <Textarea id="message" name="message" rows={5} required minLength={10} placeholder="Votre besoin…" />
             </div>
             <Button variant="brand" className="w-full" type="submit">
               Envoyer le message

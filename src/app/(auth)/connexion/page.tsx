@@ -36,7 +36,7 @@ export default async function ConnexionPage({
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium" htmlFor="password">Mot de passe</label>
-            <Link href="/connexion" className="text-xs text-brand hover:underline">
+            <Link href="/mot-de-passe-oublie" className="text-xs text-brand hover:underline">
               Mot de passe oublié ?
             </Link>
           </div>

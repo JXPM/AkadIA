@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseEnabled } from "@/lib/supabase/config";
 import { sendEmail } from "@/lib/email";
-import { confirmationEmail } from "@/lib/email-templates";
+import { confirmationEmail, recoveryEmail } from "@/lib/email-templates";
 
 function safeRedirect(target: FormDataEntryValue | null): string {
   const t = String(target ?? "");
@@ -89,6 +89,63 @@ export async function signUp(formData: FormData) {
   }
 
   redirect(`/inscription/verification?email=${encodeURIComponent(email)}`);
+}
+
+export async function demanderReinitialisation(formData: FormData) {
+  if (!isSupabaseEnabled()) redirect("/connexion");
+
+  const email = String(formData.get("email") ?? "").trim();
+  if (!email) redirect("/mot-de-passe-oublie?error=Email%20requis");
+
+  // generateLink type recovery : Supabase n'envoie rien, on émet notre email.
+  const admin = createAdminClient();
+  const { data, error } = await admin.auth.admin.generateLink({
+    type: "recovery",
+    email,
+  });
+
+  if (!error && data.properties?.hashed_token) {
+    const origin = (await headers()).get("origin") ?? "";
+    const resetUrl = `${origin}/auth/confirmer?token_hash=${encodeURIComponent(
+      data.properties.hashed_token
+    )}&type=recovery&next=${encodeURIComponent("/reinitialiser")}`;
+
+    const { data: profil } = await admin
+      .from("profiles")
+      .select("prenom")
+      .eq("id", data.user?.id ?? "")
+      .maybeSingle();
+
+    const mail = recoveryEmail({ prenom: profil?.prenom ?? undefined, resetUrl });
+    const { sent } = await sendEmail({ to: email, ...mail });
+    if (!sent) console.warn(`[auth] Lien de réinitialisation pour ${email} : ${resetUrl}`);
+  }
+  // Toujours le même message, que le compte existe ou non (anti-énumération).
+  redirect("/mot-de-passe-oublie?sent=1");
+}
+
+export async function definirNouveauMotDePasse(formData: FormData) {
+  if (!isSupabaseEnabled()) redirect("/connexion");
+
+  const password = String(formData.get("password") ?? "");
+  const confirmation = String(formData.get("confirmation") ?? "");
+  if (password.length < 8) {
+    redirect("/reinitialiser?error=" + encodeURIComponent("8 caractères minimum."));
+  }
+  if (password !== confirmation) {
+    redirect(
+      "/reinitialiser?error=" + encodeURIComponent("Les deux mots de passe ne correspondent pas.")
+    );
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    redirect("/reinitialiser?error=" + encodeURIComponent(frAuthError(error.message)));
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/app/dashboard");
 }
 
 export async function signInWithGoogle(formData: FormData) {

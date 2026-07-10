@@ -48,6 +48,48 @@ function layout(content: string): string {
 </html>`;
 }
 
+export function recoveryEmail(params: {
+  prenom?: string;
+  resetUrl: string;
+}): { subject: string; html: string; text: string } {
+  const bonjour = params.prenom ? `Bonjour ${params.prenom}` : "Bonjour";
+  const html = layout(`
+    <h1 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${BRAND_DARK};">${bonjour},</h1>
+    <p style="margin:0 0 8px;font-size:15px;line-height:1.6;color:#334155;">
+      Vous avez demandé la réinitialisation de votre mot de passe AKADIA.
+      Cliquez sur le bouton ci-dessous pour en choisir un nouveau.
+    </p>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px auto;">
+      <tr>
+        <td style="border-radius:12px;background-color:${BRAND};">
+          <a href="${params.resetUrl}"
+             style="display:inline-block;padding:14px 36px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:12px;">
+            Réinitialiser mon mot de passe
+          </a>
+        </td>
+      </tr>
+    </table>
+    <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:${MUTED};">
+      Ce lien est valable 1 heure. Si le bouton ne fonctionne pas, copiez-collez
+      cette adresse dans votre navigateur :
+    </p>
+    <p style="margin:0 0 20px;font-size:12px;line-height:1.5;word-break:break-all;">
+      <a href="${params.resetUrl}" style="color:${BRAND};">${params.resetUrl}</a>
+    </p>
+    <hr style="border:none;border-top:1px solid #e3e8f0;margin:0 0 16px;" />
+    <p style="margin:0;font-size:12px;color:${MUTED};">
+      Vous n'avez pas demandé cette réinitialisation ? Ignorez cet email,
+      votre mot de passe reste inchangé.
+    </p>
+  `);
+
+  return {
+    subject: "Réinitialisez votre mot de passe — AKADIA",
+    html,
+    text: `${bonjour},\n\nRéinitialisez votre mot de passe AKADIA :\n${params.resetUrl}\n\nCe lien est valable 1 heure. Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.`,
+  };
+}
+
 export function confirmationEmail(params: {
   prenom?: string;
   confirmUrl: string;

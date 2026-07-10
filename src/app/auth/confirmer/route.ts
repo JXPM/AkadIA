@@ -8,6 +8,9 @@ import { isSupabaseEnabled } from "@/lib/supabase/config";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const tokenHash = searchParams.get("token_hash");
+  const typeParam = searchParams.get("type");
+  const type =
+    typeParam === "recovery" || typeParam === "invite" ? typeParam : "signup";
   const next = searchParams.get("next") ?? "/app/dashboard";
   const dest = next.startsWith("/") && !next.startsWith("//") ? next : "/app/dashboard";
 
@@ -18,7 +21,7 @@ export async function GET(request: NextRequest) {
   if (tokenHash) {
     const supabase = await createClient();
     const { error } = await supabase.auth.verifyOtp({
-      type: "signup",
+      type,
       token_hash: tokenHash,
     });
     if (!error) {
