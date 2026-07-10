@@ -1,197 +1,201 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  Play,
-  HelpCircle,
-  Boxes,
-  Swords,
-  KeyRound,
-  Users,
-  Timer,
-  Trophy,
-  AlertCircle,
-  ArrowLeft,
-  Radio,
-} from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Plus, Sparkles, Play, Radio, HelpCircle, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Logo } from "@/components/brand/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { isSupabaseEnabled } from "@/lib/supabase/config";
+import { LancerSessionBouton } from "@/components/live/lancer-session";
 
-const participants = [
-  { nom: "Marie D.", score: 92, statut: "ok" },
-  { nom: "Karim B.", score: 78, statut: "ok" },
-  { nom: "Élodie F.", score: 64, statut: "bloque" },
-  { nom: "Thomas L.", score: 88, statut: "ok" },
-  { nom: "Nadia E.", score: 45, statut: "bloque" },
-  { nom: "Pierre V.", score: 71, statut: "ok" },
-];
+export const dynamic = "force-dynamic";
 
-const activites = [
-  { label: "Lancer un quiz", icon: HelpCircle },
-  { label: "Lancer un atelier", icon: Boxes },
-  { label: "Lancer un challenge", icon: Swords },
-  { label: "Escape game", icon: KeyRound },
-];
+type QuizRow = {
+  id: string;
+  titre: string;
+  created_at: string;
+  questions: { count: number }[];
+};
 
-function fmt(s: number) {
-  const m = Math.floor(s / 60);
-  const r = s % 60;
-  return `${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
-}
+type SessionRow = {
+  id: string;
+  titre: string;
+  code: string | null;
+  etat: string;
+  debut_at: string | null;
+};
 
-export default function FormateurPage() {
-  const [running, setRunning] = useState(false);
-  const [seconds, setSeconds] = useState(300);
-  const [activite, setActivite] = useState("Quiz : les bases de l'IA");
+const etatBadge: Record<string, { label: string; variant: "success" | "warning" | "muted" }> = {
+  lobby: { label: "Lobby ouvert", variant: "warning" },
+  question: { label: "En direct", variant: "success" },
+  resultats: { label: "En direct", variant: "success" },
+  terminee: { label: "Terminée", variant: "muted" },
+};
 
-  useEffect(() => {
-    if (!running) return;
-    const id = setInterval(() => setSeconds((s) => Math.max(0, s - 1)), 1000);
-    return () => clearInterval(id);
-  }, [running]);
+export default async function FormateurPage() {
+  let quizzes: QuizRow[] = [];
+  let sessions: SessionRow[] = [];
 
-  const connectes = participants.length;
-  const bloques = participants.filter((p) => p.statut === "bloque").length;
-  const moyenne = Math.round(participants.reduce((a, p) => a + p.score, 0) / connectes);
-  const classement = [...participants].sort((a, b) => b.score - a.score);
+  if (isSupabaseEnabled()) {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      const admin = createAdminClient();
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("organization_id")
+        .eq("id", user.id)
+        .maybeSingle();
+      const orgId = profile?.organization_id;
+      if (orgId) {
+        const [q, s] = await Promise.all([
+          admin
+            .from("quizzes")
+            .select("id, titre, created_at, questions(count)")
+            .eq("organization_id", orgId)
+            .order("created_at", { ascending: false }),
+          admin
+            .from("sessions")
+            .select("id, titre, code, etat, debut_at")
+            .eq("organization_id", orgId)
+            .not("quiz_id", "is", null)
+            .order("debut_at", { ascending: false })
+            .limit(8),
+        ]);
+        quizzes = (q.data ?? []) as QuizRow[];
+        sessions = (s.data ?? []) as SessionRow[];
+      }
+    }
+  }
+
+  const enDirect = sessions.filter((s) => s.etat !== "terminee");
 
   return (
-    <div className="flex h-screen flex-col">
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4">
+    <div className="min-h-screen">
+      <header className="flex h-14 items-center justify-between border-b border-border px-4 lg:px-8">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/admin">
-              <ArrowLeft className="size-4" /> Admin
+            <Link href="/app/dashboard">
+              <ArrowLeft className="size-4" /> Tableau de bord
             </Link>
           </Button>
-          <Badge variant={running ? "success" : "muted"}>
-            <Radio className="size-3" /> {running ? "Session en direct" : "Session prête"}
+          <Badge variant="brand">
+            <Radio className="size-3" /> Mode formateur
           </Badge>
         </div>
-        <Logo />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Logo showText={false} />
+        </div>
       </header>
 
-      <div className="grid min-h-0 flex-1 lg:grid-cols-[260px_1fr_300px]">
-        {/* Pilotage */}
-        <aside className="space-y-4 overflow-y-auto border-r border-border p-4">
-          <Button
-            variant={running ? "destructive" : "brand"}
-            className="w-full"
-            onClick={() => setRunning((v) => !v)}
-          >
-            <Play className="size-4" /> {running ? "Arrêter la session" : "Lancer la session"}
-          </Button>
-
+      <main className="mx-auto max-w-5xl space-y-8 px-4 py-8 lg:px-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
-              Activités
+            <h1 className="text-2xl font-bold tracking-tight">Sessions live</h1>
+            <p className="mt-1 text-muted-foreground">
+              Créez un quiz, lancez une session : vos participants rejoignent avec
+              un code ou un QR code, comme sur Kahoot.
             </p>
-            <div className="space-y-2">
-              {activites.map((a) => (
-                <button
-                  key={a.label}
-                  onClick={() => setActivite(a.label)}
-                  className="flex w-full items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm hover:bg-accent"
-                >
-                  <a.icon className="size-4 text-brand" /> {a.label}
-                </button>
-              ))}
-            </div>
           </div>
-
-          {/* Timer */}
-          <Card className="p-4 text-center">
-            <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-              <Timer className="size-3.5" /> Compte à rebours
-            </p>
-            <p className="mt-1 font-mono text-3xl font-bold tabular-nums">{fmt(seconds)}</p>
-            <div className="mt-3 flex justify-center gap-1.5">
-              {[60, 300, 600].map((s) => (
-                <Button key={s} variant="outline" size="sm" onClick={() => setSeconds(s)}>
-                  {s / 60}m
-                </Button>
-              ))}
-            </div>
-          </Card>
-        </aside>
-
-        {/* Projection */}
-        <div className="min-w-0 overflow-y-auto p-6">
-          <Card className="overflow-hidden">
-            <div className="border-b border-border bg-muted/40 px-5 py-3 text-sm font-medium">
-              Mode projection — {activite}
-            </div>
-            <div className="grid place-items-center gap-6 p-10 text-center">
-              <Badge variant="brand">Question 3 / 10</Badge>
-              <h2 className="max-w-xl text-2xl font-bold">
-                Quel composant prédit le mot suivant dans un LLM ?
-              </h2>
-              <div className="grid w-full max-w-lg gap-3 sm:grid-cols-2">
-                {["Le tokenizer", "Le modèle de langage", "La base de données", "Le navigateur"].map(
-                  (opt, i) => (
-                    <div
-                      key={opt}
-                      className="rounded-xl border border-border px-4 py-3 text-left text-sm"
-                    >
-                      <span className="font-semibold text-brand">{["A", "B", "C", "D"][i]}.</span>{" "}
-                      {opt}
-                    </div>
-                  )
-                )}
-              </div>
-            </div>
-          </Card>
-
-          {/* Tableau de bord live */}
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            {[
-              { label: "Connectés", value: connectes, icon: Users },
-              { label: "Score moyen", value: `${moyenne}%`, icon: Trophy },
-              { label: "Bloqués", value: bloques, icon: AlertCircle },
-            ].map((s) => (
-              <Card key={s.label} className="flex items-center gap-3 p-4">
-                <span className="grid size-10 place-items-center rounded-lg bg-brand/10 text-brand">
-                  <s.icon className="size-5" />
-                </span>
-                <div>
-                  <p className="text-xl font-bold">{s.value}</p>
-                  <p className="text-xs text-muted-foreground">{s.label}</p>
-                </div>
-              </Card>
-            ))}
-          </div>
-          <div className="mt-4">
-            <p className="mb-1 text-sm text-muted-foreground">Progression moyenne</p>
-            <Progress value={moyenne} />
-          </div>
+          <Button variant="brand" asChild>
+            <Link href="/formateur/quiz/nouveau">
+              <Plus className="size-4" /> Créer un quiz
+            </Link>
+          </Button>
         </div>
 
-        {/* Participants / classement */}
-        <aside className="overflow-y-auto border-l border-border p-4">
-          <p className="mb-3 text-sm font-semibold">Classement live</p>
-          <div className="space-y-2">
-            {classement.map((p, i) => (
-              <div
-                key={p.nom}
-                className="flex items-center gap-3 rounded-lg border border-border px-3 py-2"
-              >
-                <span className="grid size-6 shrink-0 place-items-center rounded-full bg-muted text-xs font-semibold">
-                  {i + 1}
-                </span>
-                <span className="flex-1 truncate text-sm">{p.nom}</span>
-                {p.statut === "bloque" && (
-                  <AlertCircle className="size-4 text-warning" />
-                )}
-                <Badge variant={i === 0 ? "brand" : "muted"}>{p.score}</Badge>
-              </div>
+        {!isSupabaseEnabled() && (
+          <Card className="p-6 text-sm text-muted-foreground">
+            Le mode live nécessite le backend Supabase (désactivé en mode démo).
+          </Card>
+        )}
+
+        {enDirect.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold">En ce moment</h2>
+            {enDirect.map((s) => (
+              <Card key={s.id} className="flex items-center justify-between gap-4 p-5">
+                <div className="flex items-center gap-3">
+                  <Badge variant={etatBadge[s.etat]?.variant ?? "muted"}>
+                    {etatBadge[s.etat]?.label ?? s.etat}
+                  </Badge>
+                  <span className="font-medium">{s.titre}</span>
+                  {s.code && (
+                    <span className="font-mono text-sm text-muted-foreground">
+                      Code {s.code}
+                    </span>
+                  )}
+                </div>
+                <Button variant="brand" size="sm" asChild>
+                  <Link href={`/formateur/session/${s.id}`}>
+                    <Play className="size-4" /> Reprendre la console
+                  </Link>
+                </Button>
+              </Card>
             ))}
-          </div>
-        </aside>
-      </div>
+          </section>
+        )}
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold">Mes quiz</h2>
+          {quizzes.length === 0 ? (
+            <Card className="flex flex-col items-center gap-3 p-10 text-center">
+              <Sparkles className="size-8 text-brand" />
+              <p className="font-medium">Aucun quiz pour l&apos;instant</p>
+              <p className="text-sm text-muted-foreground">
+                Créez votre premier quiz à la main ou générez-le avec l&apos;IA en
+                quelques secondes.
+              </p>
+              <Button variant="brand" asChild>
+                <Link href="/formateur/quiz/nouveau">
+                  <Plus className="size-4" /> Créer un quiz
+                </Link>
+              </Button>
+            </Card>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {quizzes.map((q) => (
+                <Card key={q.id} className="flex flex-col justify-between gap-4 p-5">
+                  <div>
+                    <h3 className="font-semibold">{q.titre}</h3>
+                    <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <HelpCircle className="size-4" />
+                      {q.questions?.[0]?.count ?? 0} question(s)
+                    </p>
+                  </div>
+                  <LancerSessionBouton quizId={q.id} />
+                </Card>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {sessions.some((s) => s.etat === "terminee") && (
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold">Sessions passées</h2>
+            <div className="space-y-2">
+              {sessions
+                .filter((s) => s.etat === "terminee")
+                .map((s) => (
+                  <Card key={s.id} className="flex items-center justify-between p-4 text-sm">
+                    <span>{s.titre}</span>
+                    <Link
+                      href={`/formateur/session/${s.id}`}
+                      className="text-brand hover:underline"
+                    >
+                      Voir le podium
+                    </Link>
+                  </Card>
+                ))}
+            </div>
+          </section>
+        )}
+      </main>
     </div>
   );
 }
