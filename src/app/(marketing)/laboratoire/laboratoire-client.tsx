@@ -16,6 +16,7 @@ export function LaboratoireClient({ promptLibrary }: { promptLibrary: PromptEntr
   const [domaine, setDomaine] = useState("Comptabilité");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
+  const [erreur, setErreur] = useState<string | null>(null);
 
   const domaines = ["Comptabilité", "Audit", "Fiscalité", "Contrôle de gestion", "RH", "Juridique", "Marketing", "Autre"];
 
@@ -23,13 +24,21 @@ export function LaboratoireClient({ promptLibrary }: { promptLibrary: PromptEntr
     if (!prompt.trim()) return;
     setLoading(true);
     setResult(null);
+    setErreur(null);
     try {
       const res = await fetch("/api/ai/prompt-score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt }),
       });
+      if (!res.ok) throw new Error(`Analyse indisponible (HTTP ${res.status})`);
       setResult(await res.json());
+    } catch (e) {
+      setErreur(
+        e instanceof Error && e.message.startsWith("Analyse")
+          ? e.message
+          : "L'analyse a échoué. Réessayez dans un instant."
+      );
     } finally {
       setLoading(false);
     }
@@ -100,7 +109,11 @@ export function LaboratoireClient({ promptLibrary }: { promptLibrary: PromptEntr
             <h3 className="mb-4 font-semibold">Évaluation</h3>
             {!result && !loading && (
               <div className="grid h-64 place-items-center text-center text-sm text-muted-foreground">
-                Lancez une analyse pour obtenir votre score et vos axes d&apos;amélioration.
+                {erreur ? (
+                  <span className="text-destructive">{erreur}</span>
+                ) : (
+                  <>Lancez une analyse pour obtenir votre score et vos axes d&apos;amélioration.</>
+                )}
               </div>
             )}
             {loading && (

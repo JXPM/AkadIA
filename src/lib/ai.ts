@@ -5,7 +5,10 @@
 export const AKADIA_MODEL = "anthropic/claude-opus-4-8";
 
 export function aiEnabled() {
-  return Boolean(process.env.AI_GATEWAY_API_KEY);
+  const key = process.env.AI_GATEWAY_API_KEY?.trim() ?? "";
+  // Ignore les valeurs placeholder (« your-ai-gateway-key »…) : mieux vaut
+  // le mode démo qu'un appel gateway garanti en échec.
+  return key.length > 0 && !/^(your[-_]|changeme|xxx)/i.test(key);
 }
 
 export const AKA_SYSTEM_PROMPT = `Tu es AKA, l'assistant pédagogique d'AKADIA.

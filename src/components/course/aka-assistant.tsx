@@ -39,7 +39,10 @@ export function AkaAssistant({ context }: { context?: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text, context }),
       });
-      const reader = res.body?.getReader();
+      if (!res.ok || !res.body) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let acc = "";
       while (reader) {
@@ -53,6 +56,18 @@ export function AkaAssistant({ context }: { context?: string }) {
         });
         scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight);
       }
+    } catch {
+      setMessages((m) =>
+        m.map((msg, i) =>
+          i === m.length - 1
+            ? {
+                role: "assistant" as const,
+                content:
+                  "Désolé, je suis momentanément indisponible. Réessaie dans un instant. 🙏",
+              }
+            : msg
+        )
+      );
     } finally {
       setLoading(false);
     }

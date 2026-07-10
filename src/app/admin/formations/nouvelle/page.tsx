@@ -39,7 +39,11 @@ export default function GenerateurFormationPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ titre: t }),
       });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setPlan(await res.json());
+    } catch {
+      setPlan(null);
+      alert("La génération a échoué. Réessayez dans un instant.");
     } finally {
       setLoading(false);
     }
