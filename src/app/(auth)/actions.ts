@@ -108,6 +108,59 @@ export async function signUp(formData: FormData) {
   redirect(`/inscription/verification?email=${encodeURIComponent(email)}`);
 }
 
+/** Inscription via lien d'invitation partageable : rejoint l'organisation
+ *  du code en apprenant (le code est revalidé côté serveur). */
+export async function signUpViaInvitation(formData: FormData) {
+  if (!isSupabaseEnabled()) redirect("/app/dashboard");
+
+  const code = String(formData.get("code") ?? "").trim();
+  const email = String(formData.get("email") ?? "");
+  const password = String(formData.get("password") ?? "");
+  const prenom = String(formData.get("prenom") ?? "");
+  const nom = String(formData.get("nom") ?? "");
+
+  const admin = createAdminClient();
+  const { data: org } = await admin
+    .from("organizations")
+    .select("id, nom")
+    .eq("invite_code", code)
+    .maybeSingle();
+  if (!org) {
+    redirect(`/invitation/${encodeURIComponent(code)}?error=${encodeURIComponent("Lien d'invitation invalide.")}`);
+  }
+
+  const { data, error } = await admin.auth.admin.generateLink({
+    type: "signup",
+    email,
+    password,
+    options: {
+      data: {
+        prenom,
+        nom,
+        invited_org: org!.id,
+        invited_role: "apprenant",
+      },
+    },
+  });
+  if (error) {
+    redirect(
+      `/invitation/${encodeURIComponent(code)}?error=${encodeURIComponent(frAuthError(error.message))}`
+    );
+  }
+
+  const tokenHash = data.properties?.hashed_token;
+  const origin = (await headers()).get("origin") ?? "";
+  const confirmUrl = `${origin}/auth/confirmer?token_hash=${encodeURIComponent(
+    tokenHash ?? ""
+  )}&next=${encodeURIComponent("/app/dashboard")}`;
+
+  const mail = confirmationEmail({ prenom, confirmUrl });
+  const { sent } = await sendEmail({ to: email, ...mail });
+  if (!sent) console.warn(`[auth] Lien de confirmation (invitation) pour ${email} : ${confirmUrl}`);
+
+  redirect(`/inscription/verification?email=${encodeURIComponent(email)}`);
+}
+
 export async function demanderReinitialisation(formData: FormData) {
   if (!isSupabaseEnabled()) redirect("/connexion");
 

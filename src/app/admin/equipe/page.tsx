@@ -1,8 +1,10 @@
+import { headers } from "next/headers";
 import { UserPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { LienInvitation } from "@/components/admin/lien-invitation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseEnabled } from "@/lib/supabase/config";
@@ -34,6 +36,7 @@ export default async function EquipePage({
   const { sent, error } = await searchParams;
 
   let membres: Membre[] = [];
+  let lienInvitation: string | null = null;
   if (isSupabaseEnabled()) {
     const supabase = await createClient();
     const {
@@ -47,6 +50,15 @@ export default async function EquipePage({
         .eq("id", user.id)
         .maybeSingle();
       if (me?.organization_id) {
+        const { data: org } = await admin
+          .from("organizations")
+          .select("invite_code")
+          .eq("id", me.organization_id)
+          .maybeSingle();
+        if (org?.invite_code) {
+          const origin = (await headers()).get("origin") ?? "";
+          lienInvitation = `${origin}/invitation/${org.invite_code}`;
+        }
         const [{ data: profils }, { data: users }] = await Promise.all([
           admin
             .from("profiles")
@@ -87,6 +99,8 @@ export default async function EquipePage({
           {error}
         </p>
       )}
+
+      {lienInvitation && <LienInvitation url={lienInvitation} />}
 
       <Card className="p-5">
         <p className="mb-3 flex items-center gap-2 text-sm font-semibold">

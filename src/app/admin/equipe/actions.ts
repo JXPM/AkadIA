@@ -1,5 +1,6 @@
 "use server";
 
+import { randomBytes } from "node:crypto";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -7,6 +8,34 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email";
 import { invitationEmail } from "@/lib/email-templates";
+
+/** Régénère le lien d'invitation partageable (l'ancien devient invalide). */
+export async function regenererLienInvitation(): Promise<{ ok?: boolean; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/connexion");
+
+  const admin = createAdminClient();
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("organization_id, role")
+    .eq("id", user!.id)
+    .maybeSingle();
+  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
+    redirect("/app/dashboard");
+  }
+
+  const { error } = await admin
+    .from("organizations")
+    .update({ invite_code: randomBytes(6).toString("hex") })
+    .eq("id", profile!.organization_id);
+  if (error) return { error: "Régénération impossible." };
+
+  revalidatePath("/admin/equipe");
+  return { ok: true };
+}
 
 // Invite un membre (apprenant ou formateur) dans l'organisation de l'admin.
 // Le trigger handle_new_user (migration 0005) lit invited_org/invited_role
