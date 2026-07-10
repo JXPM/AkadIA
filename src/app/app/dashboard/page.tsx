@@ -10,15 +10,24 @@ import {
   BrainCircuit,
   GraduationCap,
   ArrowRight,
+  BookOpen,
+  Sparkles,
+  type LucideIcon,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { getFormations, getBadges } from "@/lib/queries";
+import {
+  getFormations,
+  getBadges,
+  getCurrentProfile,
+  getLearnerStats,
+  isSupabaseEnabled,
+} from "@/lib/queries";
 import { cn } from "@/lib/utils";
 
-const badgeIcons: Record<string, typeof Compass> = {
+const badgeIcons: Record<string, LucideIcon> = {
   Compass,
   Wand2,
   BarChart3,
@@ -26,14 +35,15 @@ const badgeIcons: Record<string, typeof Compass> = {
   GraduationCap,
 };
 
-const kpis = [
+// Contenu fictif affiché uniquement en mode démo (NEXT_PUBLIC_DEMO_MODE=1).
+const demoKpis = [
   { label: "Progression globale", value: "72 %", icon: TrendingUp, hint: "+8 % cette semaine" },
   { label: "Temps d'apprentissage", value: "41 h", icon: Clock, hint: "Ce mois-ci" },
   { label: "Certifications", value: "3", icon: Award, hint: "Obtenues" },
   { label: "Badges", value: "3 / 5", icon: Trophy, hint: "Niveau 6" },
 ];
 
-const activites = [
+const demoActivites = [
   { txt: "Quiz « Les bases » réussi — 9/10", time: "Il y a 2 h", icon: Trophy },
   { txt: "Capsule vidéo « Qu'est-ce qu'un LLM ? » visionnée", time: "Il y a 5 h", icon: GraduationCap },
   { txt: "Badge « Prompt Master » débloqué", time: "Hier", icon: Wand2 },
@@ -41,18 +51,68 @@ const activites = [
 ];
 
 export default async function DashboardPage() {
-  const [formations, badges] = await Promise.all([getFormations(), getBadges()]);
-  const progressByIndex = [68, 35, 90];
-  const enCours = [formations[0], formations[2], formations[3]]
-    .filter(Boolean)
-    .map((f, i) => ({ ...f, progress: progressByIndex[i] ?? 50 }));
+  const demo = !isSupabaseEnabled();
+  const [formations, badges, profile, stats] = await Promise.all([
+    getFormations(),
+    getBadges(),
+    getCurrentProfile(),
+    getLearnerStats(),
+  ]);
+
+  const publiees = formations.filter((f) => f.status === "publiee");
+  const prenom = demo
+    ? "Marie"
+    : (profile?.userName ?? "").split(" ")[0] || "bienvenue";
+
+  // KPIs : fictifs en démo, réels (comptages Supabase) sinon.
+  const kpis = demo
+    ? demoKpis
+    : [
+        {
+          label: "Formations disponibles",
+          value: String(publiees.length),
+          icon: BookOpen,
+          hint: "Dans votre organisation",
+        },
+        {
+          label: "Quiz réussis",
+          value: String(stats?.quizReussis ?? 0),
+          icon: TrendingUp,
+          hint: stats?.quizReussis ? "Bravo !" : "À vous de jouer",
+        },
+        {
+          label: "Certificats",
+          value: String(stats?.certificats ?? 0),
+          icon: Award,
+          hint: "Obtenus",
+        },
+        {
+          label: "Badges",
+          value: `${stats?.badgesObtenus ?? 0} / ${stats?.badgesTotal ?? badges.length}`,
+          icon: Trophy,
+          hint: "Débloqués",
+        },
+      ];
+
+  // En démo : fausses formations « en cours » avec progression.
+  // En réel : les formations publiées, à démarrer (pas de fausse progression).
+  const demoProgress = [68, 35, 90];
+  const enCours = demo
+    ? [formations[0], formations[2], formations[3]]
+        .filter(Boolean)
+        .map((f, i) => ({ ...f, progress: demoProgress[i] ?? 50 }))
+    : publiees.slice(0, 3).map((f) => ({ ...f, progress: null as number | null }));
+
+  const activites = demo ? demoActivites : [];
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Bonjour, Marie 👋</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Bonjour, {prenom} 👋</h1>
         <p className="mt-1 text-muted-foreground">
-          Vous êtes à 72 % de vos objectifs. Continuez sur votre lancée !
+          {demo
+            ? "Vous êtes à 72 % de vos objectifs. Continuez sur votre lancée !"
+            : "Bienvenue sur AKADIA. Choisissez une formation pour commencer votre parcours."}
         </p>
       </div>
 
@@ -75,34 +135,61 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Formations en cours */}
+        {/* Formations */}
         <div className="space-y-4 lg:col-span-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Formations en cours</h2>
+            <h2 className="text-lg font-semibold">
+              {demo ? "Formations en cours" : "Formations pour vous"}
+            </h2>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/catalogue">
                 Catalogue <ArrowRight />
               </Link>
             </Button>
           </div>
-          {enCours.map((f) => (
-            <Card key={f.id}>
-              <CardContent className="flex items-center gap-4 p-5">
-                <div className="h-14 w-14 shrink-0 rounded-lg gradient-brand" />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="truncate font-medium">{f.titre}</h3>
-                    <Badge variant="muted">{f.progress}%</Badge>
-                  </div>
-                  <p className="mb-2 text-xs text-muted-foreground">{f.categorie}</p>
-                  <Progress value={f.progress} />
-                </div>
+          {enCours.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center gap-3 p-10 text-center">
+                <Sparkles className="size-8 text-brand" />
+                <p className="font-medium">Aucune formation disponible pour l&apos;instant</p>
+                <p className="text-sm text-muted-foreground">
+                  Explorez le catalogue pour découvrir les parcours de votre organisation.
+                </p>
                 <Button variant="brand" size="sm" asChild>
-                  <Link href={`/cours/${f.slug}`}>Reprendre</Link>
+                  <Link href="/catalogue">Parcourir le catalogue</Link>
                 </Button>
               </CardContent>
             </Card>
-          ))}
+          ) : (
+            enCours.map((f) => (
+              <Card key={f.id}>
+                <CardContent className="flex items-center gap-4 p-5">
+                  <div className="h-14 w-14 shrink-0 rounded-lg gradient-brand" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="truncate font-medium">{f.titre}</h3>
+                      {f.progress !== null && (
+                        <Badge variant="muted">{f.progress}%</Badge>
+                      )}
+                    </div>
+                    <p className="mb-2 text-xs text-muted-foreground">{f.categorie}</p>
+                    {f.progress !== null ? (
+                      <Progress value={f.progress} />
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        {f.duree} h · {f.difficulte}
+                      </p>
+                    )}
+                  </div>
+                  <Button variant="brand" size="sm" asChild>
+                    <Link href={`/cours/${f.slug}`}>
+                      {f.progress !== null ? "Reprendre" : "Commencer"}
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
 
         {/* Colonne droite */}
@@ -139,17 +226,24 @@ export default async function DashboardPage() {
               <CardTitle className="text-base">Activités récentes</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {activites.map((a, i) => (
-                <div key={i} className="flex gap-3">
-                  <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-accent text-brand">
-                    <a.icon className="size-4" />
-                  </span>
-                  <div>
-                    <p className="text-sm">{a.txt}</p>
-                    <p className="text-xs text-muted-foreground">{a.time}</p>
+              {activites.length === 0 ? (
+                <p className="py-4 text-center text-sm text-muted-foreground">
+                  Aucune activité pour l&apos;instant. Vos quiz, badges et leçons
+                  terminées apparaîtront ici.
+                </p>
+              ) : (
+                activites.map((a, i) => (
+                  <div key={i} className="flex gap-3">
+                    <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-accent text-brand">
+                      <a.icon className="size-4" />
+                    </span>
+                    <div>
+                      <p className="text-sm">{a.txt}</p>
+                      <p className="text-xs text-muted-foreground">{a.time}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </CardContent>
           </Card>
         </div>

@@ -225,7 +225,7 @@ export async function getCurrentProfile(): Promise<{ userName: string; role: str
   return { userName, role: roleLabel[data?.role ?? "apprenant"] ?? "Apprenant" };
 }
 
-/** Badges (définitions). Le statut "obtenu" reste géré côté apprenant. */
+/** Badges (définitions), avec statut "obtenu" de l'utilisateur connecté. */
 export async function getBadges(): Promise<BadgeDef[]> {
   if (!isSupabaseEnabled()) return demoBadges;
 
@@ -238,11 +238,66 @@ export async function getBadges(): Promise<BadgeDef[]> {
     console.error("[queries] getBadges:", error.message);
     return demoBadges;
   }
+
+  const obtenus = new Set<string>();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    const { data: achievements } = await supabase
+      .from("achievements")
+      .select("badge_id")
+      .eq("user_id", user.id);
+    for (const a of achievements ?? []) obtenus.add(a.badge_id);
+  }
+
   return (data ?? []).map((b) => ({
     id: b.id,
     nom: b.nom,
     description: b.description ?? "",
     icone: b.icone ?? "Award",
-    obtenu: false,
+    obtenu: obtenus.has(b.id),
   }));
+}
+
+export type LearnerStats = {
+  quizReussis: number;
+  badgesObtenus: number;
+  badgesTotal: number;
+  certificats: number;
+};
+
+/** Statistiques réelles de l'apprenant connecté, ou null (mode démo / déconnecté). */
+export async function getLearnerStats(): Promise<LearnerStats | null> {
+  if (!isSupabaseEnabled()) return null;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const [attempts, achievements, certificates, badgesTotal] = await Promise.all([
+    supabase
+      .from("attempts")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("reussi", true),
+    supabase
+      .from("achievements")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id),
+    supabase
+      .from("certificates")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id),
+    supabase.from("badges").select("id", { count: "exact", head: true }),
+  ]);
+
+  return {
+    quizReussis: attempts.count ?? 0,
+    badgesObtenus: achievements.count ?? 0,
+    badgesTotal: badgesTotal.count ?? 0,
+    certificats: certificates.count ?? 0,
+  };
 }

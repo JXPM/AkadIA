@@ -44,7 +44,7 @@ export type NavItem = { href: string; label: string; icon: string };
 export function AppShell({
   nav,
   role,
-  userName = "Marie Durand",
+  userName = "Mon compte",
   children,
 }: {
   nav: NavItem[];
