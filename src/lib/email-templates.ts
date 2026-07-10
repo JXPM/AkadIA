@@ -48,6 +48,49 @@ function layout(content: string): string {
 </html>`;
 }
 
+export function invitationEmail(params: {
+  organisation: string;
+  invitant?: string;
+  inviteUrl: string;
+}): { subject: string; html: string; text: string } {
+  const par = params.invitant ? ` par ${params.invitant}` : "";
+  const html = layout(`
+    <h1 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${BRAND_DARK};">Vous êtes invité·e 🎓</h1>
+    <p style="margin:0 0 8px;font-size:15px;line-height:1.6;color:#334155;">
+      Vous avez été invité·e${par} à rejoindre l'espace de formation
+      <strong>${params.organisation}</strong> sur AKADIA. Activez votre compte
+      pour accéder aux formations de votre organisation.
+    </p>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px auto;">
+      <tr>
+        <td style="border-radius:12px;background-color:${BRAND};">
+          <a href="${params.inviteUrl}"
+             style="display:inline-block;padding:14px 36px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:12px;">
+            Rejoindre ${params.organisation}
+          </a>
+        </td>
+      </tr>
+    </table>
+    <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:${MUTED};">
+      Vous choisirez votre mot de passe à la première connexion. Si le bouton
+      ne fonctionne pas, copiez-collez cette adresse :
+    </p>
+    <p style="margin:0 0 20px;font-size:12px;line-height:1.5;word-break:break-all;">
+      <a href="${params.inviteUrl}" style="color:${BRAND};">${params.inviteUrl}</a>
+    </p>
+    <hr style="border:none;border-top:1px solid #e3e8f0;margin:0 0 16px;" />
+    <p style="margin:0;font-size:12px;color:${MUTED};">
+      Vous ne connaissez pas ${params.organisation} ? Ignorez simplement cet email.
+    </p>
+  `);
+
+  return {
+    subject: `Invitation à rejoindre ${params.organisation} — AKADIA`,
+    html,
+    text: `Vous avez été invité·e${par} à rejoindre ${params.organisation} sur AKADIA.\nActivez votre compte : ${params.inviteUrl}\n\nVous choisirez votre mot de passe à la première connexion.`,
+  };
+}
+
 export function recoveryEmail(params: {
   prenom?: string;
   resetUrl: string;

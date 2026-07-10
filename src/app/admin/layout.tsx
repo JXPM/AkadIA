@@ -6,6 +6,7 @@ const nav: NavItem[] = [
   { href: "/admin", label: "Vue d'ensemble", icon: "BarChart3" },
   { href: "/admin/formations", label: "Formations", icon: "FolderKanban" },
   { href: "/admin/formations/nouvelle", label: "Générateur IA", icon: "GraduationCap" },
+  { href: "/admin/equipe", label: "Équipe", icon: "Users" },
   { href: "/app/dashboard", label: "Espace apprenant", icon: "BookOpen" },
   { href: "/formateur", label: "Mode formateur", icon: "MonitorPlay" },
 ];

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Sparkles, Pencil, Star } from "lucide-react";
+import { Sparkles, Eye, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -23,16 +23,11 @@ export default async function AdminFormationsPage() {
             Créez et gérez un nombre illimité de formations.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" asChild>
-            <Link href="/admin/formations/nouvelle">
-              <Sparkles className="size-4" /> Générer avec l&apos;IA
-            </Link>
-          </Button>
-          <Button variant="brand">
-            <Plus className="size-4" /> Nouvelle formation
-          </Button>
-        </div>
+        <Button variant="brand" asChild>
+          <Link href="/admin/formations/nouvelle">
+            <Sparkles className="size-4" /> Nouvelle formation (IA)
+          </Link>
+        </Button>
       </div>
 
       <Card className="overflow-hidden">
@@ -73,8 +68,10 @@ export default async function AdminFormationsPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button variant="ghost" size="icon" aria-label="Éditer">
-                        <Pencil className="size-4" />
+                      <Button variant="ghost" size="icon" aria-label="Voir la formation" asChild>
+                        <Link href={`/catalogue/${f.slug}`}>
+                          <Eye className="size-4" />
+                        </Link>
                       </Button>
                     </td>
                   </tr>

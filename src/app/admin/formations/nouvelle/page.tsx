@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Sparkles, Loader2, BookOpen, HelpCircle, Trophy, FileText, Library } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { creerFormationDepuisPlan } from "./actions";
 
 type Plan = {
   titre: string;
@@ -25,9 +27,30 @@ const exemples = [
 ];
 
 export default function GenerateurFormationPage() {
+  const router = useRouter();
   const [titre, setTitre] = useState("");
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState<Plan | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  async function creerFormation() {
+    if (!plan) return;
+    setSaving(true);
+    setSaveError(null);
+    const res = await creerFormationDepuisPlan({
+      titre: plan.titre,
+      objectifs: plan.objectifs,
+      modules: plan.modules,
+      projetFinal: plan.projetFinal,
+    });
+    if (res.ok) {
+      router.push("/admin/formations");
+    } else {
+      setSaveError(res.error ?? "Enregistrement impossible.");
+      setSaving(false);
+    }
+  }
 
   async function generer(t = titre) {
     if (!t.trim()) return;
@@ -163,9 +186,12 @@ export default function GenerateurFormationPage() {
             </Card>
           </div>
 
-          <div className="flex justify-end gap-2">
-            <Button variant="outline">Éditer le plan</Button>
-            <Button variant="brand">Créer la formation</Button>
+          <div className="flex items-center justify-end gap-3">
+            {saveError && <p className="text-sm text-destructive">{saveError}</p>}
+            <Button variant="brand" onClick={creerFormation} disabled={saving}>
+              {saving ? <Loader2 className="size-4 animate-spin" /> : null}
+              Créer la formation (brouillon)
+            </Button>
           </div>
         </div>
       )}
