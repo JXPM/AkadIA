@@ -1,5 +1,6 @@
+import { redirect } from "next/navigation";
 import { AppShell, type NavItem } from "@/components/layout/app-shell";
-import { getCurrentProfile } from "@/lib/queries";
+import { getCurrentProfile, isSupabaseEnabled } from "@/lib/queries";
 
 const nav: NavItem[] = [
   { href: "/admin", label: "Vue d'ensemble", icon: "BarChart3" },
@@ -11,6 +12,16 @@ const nav: NavItem[] = [
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const profile = await getCurrentProfile();
+
+  // Double verrou (en plus du middleware) : réservé aux administrateurs.
+  if (
+    isSupabaseEnabled() &&
+    profile?.roleKey !== "admin" &&
+    profile?.roleKey !== "super_admin"
+  ) {
+    redirect("/app/dashboard");
+  }
+
   return (
     <AppShell nav={nav} role={profile?.role ?? "Administrateur"} userName={profile?.userName ?? "Admin AKADIA"}>
       {children}

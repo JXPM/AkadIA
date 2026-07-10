@@ -195,15 +195,23 @@ export async function getPromptLibrary(): Promise<PromptEntry[]> {
   }));
 }
 
-const roleLabel: Record<string, string> = {
+export type RoleKey = "apprenant" | "formateur" | "admin" | "super_admin";
+
+const roleLabel: Record<RoleKey, string> = {
   apprenant: "Apprenant",
   formateur: "Formateur",
   admin: "Administrateur",
   super_admin: "Super admin",
 };
 
-/** Profil de l'utilisateur connecté (nom affichable + libellé de rôle), ou null. */
-export async function getCurrentProfile(): Promise<{ userName: string; role: string } | null> {
+export type CurrentProfile = {
+  userName: string;
+  role: string;
+  roleKey: RoleKey;
+};
+
+/** Profil de l'utilisateur connecté (nom, libellé et clé de rôle), ou null. */
+export async function getCurrentProfile(): Promise<CurrentProfile | null> {
   if (!isSupabaseEnabled()) return null;
 
   const supabase = await createClient();
@@ -222,7 +230,8 @@ export async function getCurrentProfile(): Promise<{ userName: string; role: str
     [data?.prenom, data?.nom].filter(Boolean).join(" ").trim() ||
     user.email ||
     "Utilisateur";
-  return { userName, role: roleLabel[data?.role ?? "apprenant"] ?? "Apprenant" };
+  const roleKey = (data?.role ?? "apprenant") as RoleKey;
+  return { userName, role: roleLabel[roleKey] ?? "Apprenant", roleKey };
 }
 
 /** Badges (définitions), avec statut "obtenu" de l'utilisateur connecté. */

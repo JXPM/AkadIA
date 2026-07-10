@@ -34,12 +34,37 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const isProtected = path.startsWith("/app") || path.startsWith("/admin");
+  const isProtected =
+    path.startsWith("/app") ||
+    path.startsWith("/admin") ||
+    path.startsWith("/formateur") ||
+    path.startsWith("/cours");
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = "/connexion";
     url.searchParams.set("redirect", path);
     return NextResponse.redirect(url);
+  }
+
+  // Contrôle par rôle : /admin réservé aux admins, /formateur aux
+  // formateurs et admins. Les apprenants sont renvoyés vers leur espace.
+  const needsRole = path.startsWith("/admin")
+    ? ["admin", "super_admin"]
+    : path.startsWith("/formateur")
+      ? ["admin", "super_admin", "formateur"]
+      : null;
+  if (user && needsRole) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (!needsRole.includes(profile?.role ?? "apprenant")) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/app/dashboard";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
   }
 
   // Évite de rester sur les pages d'auth une fois connecté.
