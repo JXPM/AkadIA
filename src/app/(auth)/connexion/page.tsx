@@ -47,15 +47,21 @@ export default async function ConnexionPage({
         </Button>
       </form>
 
-      <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
-        <span className="h-px flex-1 bg-border" /> OU <span className="h-px flex-1 bg-border" />
-      </div>
-      <form action={signInWithGoogle}>
-        <input type="hidden" name="redirect" value={dest} />
-        <Button variant="outline" className="w-full" type="submit">
-          Continuer avec Google
-        </Button>
-      </form>
+      {/* Affiché uniquement quand le provider Google est configuré dans
+          Supabase (Auth → Providers) : NEXT_PUBLIC_GOOGLE_AUTH=1. */}
+      {process.env.NEXT_PUBLIC_GOOGLE_AUTH === "1" && (
+        <>
+          <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="h-px flex-1 bg-border" /> OU <span className="h-px flex-1 bg-border" />
+          </div>
+          <form action={signInWithGoogle}>
+            <input type="hidden" name="redirect" value={dest} />
+            <Button variant="outline" className="w-full" type="submit">
+              Continuer avec Google
+            </Button>
+          </form>
+        </>
+      )}
 
       <p className="mt-8 text-center text-sm text-muted-foreground">
         Pas encore de compte ?{" "}
