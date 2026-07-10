@@ -49,11 +49,12 @@ export function AkaAssistant({ context }: { context?: string }) {
         const { done, value } = await reader.read();
         if (done) break;
         acc += decoder.decode(value, { stream: true });
-        setMessages((m) => {
-          const copy = [...m];
-          copy[copy.length - 1] = { role: "assistant", content: acc };
-          return copy;
-        });
+        const contenu = acc;
+        setMessages((m) =>
+          m.map((msg, i) =>
+            i === m.length - 1 ? { role: "assistant" as const, content: contenu } : msg
+          )
+        );
         scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight);
       }
     } catch {
