@@ -15,7 +15,6 @@ export const dynamic = "force-dynamic";
 type QuizRow = {
   id: string;
   titre: string;
-  created_at: string;
   questions: { count: number }[];
 };
 
@@ -55,9 +54,9 @@ export default async function FormateurPage() {
         const [q, s] = await Promise.all([
           admin
             .from("quizzes")
-            .select("id, titre, created_at, questions(count)")
+            .select("id, titre, questions(count)")
             .eq("organization_id", orgId)
-            .order("created_at", { ascending: false }),
+            .order("titre", { ascending: true }),
           admin
             .from("sessions")
             .select("id, titre, code, etat, debut_at")
