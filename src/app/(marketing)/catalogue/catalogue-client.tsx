@@ -9,7 +9,13 @@ import { categories } from "@/lib/data";
 import type { Formation } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export function CatalogueClient({ formations }: { formations: Formation[] }) {
+export function CatalogueClient({
+  formations,
+  hrefBase = "/catalogue",
+}: {
+  formations: Formation[];
+  hrefBase?: string;
+}) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string | null>(null);
 
@@ -88,7 +94,7 @@ export function CatalogueClient({ formations }: { formations: Formation[] }) {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {results.map((f) => (
-              <FormationCard key={f.id} formation={f} />
+              <FormationCard key={f.id} formation={f} hrefBase={hrefBase} />
             ))}
           </div>
         )}

@@ -3,7 +3,7 @@ import { getCurrentProfile, isSupabaseEnabled } from "@/lib/queries";
 
 const baseNav: NavItem[] = [
   { href: "/app/dashboard", label: "Tableau de bord", icon: "LayoutDashboard" },
-  { href: "/catalogue", label: "Catalogue", icon: "BookOpen" },
+  { href: "/app/catalogue", label: "Catalogue", icon: "BookOpen" },
   { href: "/laboratoire", label: "Laboratoire IA", icon: "FlaskConical" },
 ];
 

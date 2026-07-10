@@ -142,7 +142,7 @@ export default async function DashboardPage() {
               {demo ? "Formations en cours" : "Formations pour vous"}
             </h2>
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/catalogue">
+              <Link href="/app/catalogue">
                 Catalogue <ArrowRight />
               </Link>
             </Button>
@@ -156,7 +156,7 @@ export default async function DashboardPage() {
                   Explorez le catalogue pour découvrir les parcours de votre organisation.
                 </p>
                 <Button variant="brand" size="sm" asChild>
-                  <Link href="/catalogue">Parcourir le catalogue</Link>
+                  <Link href="/app/catalogue">Parcourir le catalogue</Link>
                 </Button>
               </CardContent>
             </Card>

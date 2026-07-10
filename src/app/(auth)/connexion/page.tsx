@@ -28,7 +28,8 @@ export default async function ConnexionPage({
       )}
 
       <form action={signIn} className="mt-8 space-y-4">
-        <input type="hidden" name="redirect" value={dest} />
+        {/* vide = atterrissage selon le rôle (admin/formateur/apprenant) */}
+        <input type="hidden" name="redirect" value={redirect ?? ""} />
         <div className="space-y-1.5">
           <label className="text-sm font-medium" htmlFor="email">Email</label>
           <Input id="email" name="email" type="email" required placeholder="vous@entreprise.fr" />

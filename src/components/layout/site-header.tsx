@@ -7,6 +7,7 @@ import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { createClient } from "@/lib/supabase/client";
+import { roleHome } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
 const nav = [
@@ -18,8 +19,9 @@ const nav = [
 ];
 
 // Session lue côté client pour garder les pages marketing statiques.
-function useSessionName(): string | null {
-  const [name, setName] = useState<string | null>(null);
+// Retourne aussi l'espace du rôle (admin/formateur/apprenant).
+function useSession(): { name: string; home: string } | null {
+  const [session, setSession] = useState<{ name: string; home: string } | null>(null);
 
   useEffect(() => {
     if (
@@ -30,20 +32,28 @@ function useSessionName(): string | null {
       return;
     }
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(async ({ data }) => {
       const u = data.user;
       if (!u) return;
       const prenom = (u.user_metadata?.prenom as string | undefined)?.trim();
-      setName(prenom || u.email || "Mon compte");
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", u.id)
+        .maybeSingle();
+      setSession({
+        name: prenom || u.email || "Mon compte",
+        home: roleHome(profile?.role),
+      });
     });
   }, []);
 
-  return name;
+  return session;
 }
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const sessionName = useSessionName();
+  const session = useSession();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
@@ -64,9 +74,9 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-2 md:flex">
           <ThemeToggle />
-          {sessionName ? (
+          {session ? (
             <Button variant="brand" size="sm" asChild>
-              <Link href="/app/dashboard">
+              <Link href={session.home}>
                 <LayoutDashboard className="size-4" /> Mon espace
               </Link>
             </Button>
@@ -113,9 +123,9 @@ export function SiteHeader() {
             </Link>
           ))}
           <div className="flex gap-2 pt-2">
-            {sessionName ? (
+            {session ? (
               <Button variant="brand" size="sm" className="flex-1" asChild>
-                <Link href="/app/dashboard" onClick={() => setOpen(false)}>
+                <Link href={session.home} onClick={() => setOpen(false)}>
                   <LayoutDashboard className="size-4" /> Mon espace
                 </Link>
               </Button>

@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { roleHome } from "@/lib/roles";
 
 // Rafraîchit la session Supabase (cookies) à chaque requête et protège les
 // espaces privés. Appelé par `src/middleware.ts` uniquement quand le backend
@@ -67,10 +68,16 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // Évite de rester sur les pages d'auth une fois connecté.
+  // Évite de rester sur les pages d'auth une fois connecté :
+  // chacun est renvoyé vers l'espace de son rôle.
   if (user && (path === "/connexion" || path === "/inscription")) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
     const url = request.nextUrl.clone();
-    url.pathname = "/app/dashboard";
+    url.pathname = roleHome(profile?.role);
     url.search = "";
     return NextResponse.redirect(url);
   }

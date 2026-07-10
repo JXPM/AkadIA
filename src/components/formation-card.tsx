@@ -14,9 +14,16 @@ const gradients: Record<string, string> = {
   "gradient-6": "from-slate-600 via-blue-800 to-slate-700",
 };
 
-export function FormationCard({ formation }: { formation: Formation }) {
+export function FormationCard({
+  formation,
+  hrefBase = "/catalogue",
+}: {
+  formation: Formation;
+  /** Préfixe des liens : "/catalogue" (marketing) ou "/app/catalogue" (espace connecté). */
+  hrefBase?: string;
+}) {
   return (
-    <Link href={`/catalogue/${formation.slug}`} className="group block">
+    <Link href={`${hrefBase}/${formation.slug}`} className="group block">
       <Card className="h-full overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all">
         <div
           className={cn(

@@ -8,11 +8,22 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseEnabled } from "@/lib/supabase/config";
 import { sendEmail } from "@/lib/email";
 import { confirmationEmail, recoveryEmail } from "@/lib/email-templates";
+import { roleHome } from "@/lib/roles";
 
 function safeRedirect(target: FormDataEntryValue | null): string {
   const t = String(target ?? "");
   // N'autoriser que les chemins internes.
   return t.startsWith("/") && !t.startsWith("//") ? t : "/app/dashboard";
+}
+
+async function homeForUser(userId: string): Promise<string> {
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
+    .maybeSingle();
+  return roleHome(data?.role);
 }
 
 // Traduit les erreurs Supabase Auth affichées à l'utilisateur.
@@ -33,19 +44,25 @@ function frAuthError(message: string): string {
 }
 
 export async function signIn(formData: FormData) {
-  const dest = safeRedirect(formData.get("redirect"));
+  const demande = String(formData.get("redirect") ?? "");
 
   // Mode démo : accès direct sans authentification.
-  if (!isSupabaseEnabled()) redirect(dest);
+  if (!isSupabaseEnabled()) redirect(safeRedirect(demande));
 
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
     redirect(`/connexion?error=${encodeURIComponent(frAuthError(error.message))}`);
   }
+
+  // Destination explicite (page protégée demandée) sinon espace du rôle.
+  const dest =
+    demande.startsWith("/") && !demande.startsWith("//")
+      ? demande
+      : await homeForUser(data.user!.id);
 
   revalidatePath("/", "layout");
   redirect(dest);
